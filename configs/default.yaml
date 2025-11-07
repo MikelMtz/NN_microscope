@@ -1,0 +1,42 @@
+run_name: demo
+seed: 123
+
+
+# data
+train_size: 15000
+test_size: 5000
+dim: 30
+spec: "{1,2}+{1,2,3,4}+{8}"
+noise_std: 0.0
+shuffle_labels: false
+
+
+# model
+width: 256
+depth: 3
+activation: relu
+
+
+# training
+epochs: 1000
+lr: 1.0e-3
+optimizer: gd
+momentum: 0.0
+mode: gd # gd or sgd
+batch_size: 2048
+
+
+# device
+device: cuda
+
+
+# kernel metrics
+compute_kernel: false
+compute_kernel_every: 5
+kernel_set: train # train or test
+max_kernel_points: 25000
+last_top_k: 15
+lower_top_k: 15
+betas: [0.2, 0.2, 0.2]
+track_U: true
+save_transfers: true

@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: ffnn-metrics
+Version: 0.1.0
+Summary: FFNN training + forward/backward kernels + metrics + plots
+Author: You
+Requires-Python: >=3.9
+Requires-Dist: torch>=2.2
+Requires-Dist: numpy>=1.24
+Requires-Dist: pandas>=2.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: matplotlib>=3.7
+Requires-Dist: tqdm>=4.66

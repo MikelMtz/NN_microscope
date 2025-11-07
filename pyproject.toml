@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "ffnn-metrics"
+version = "0.1.0"
+description = "FFNN training + forward/backward kernels + metrics + plots"
+authors = [{name = "You"}]
+requires-python = ">=3.9"
+dependencies = [
+"torch>=2.2",
+"numpy>=1.24",
+"pandas>=2.0",
+"pyyaml>=6.0",
+"matplotlib>=3.7",
+"tqdm>=4.66"
+]
+
+
+[tool.setuptools.packages.find]
+where = ["src"]

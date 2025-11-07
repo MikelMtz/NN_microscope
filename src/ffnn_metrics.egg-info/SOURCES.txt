@@ -1,0 +1,12 @@
+pyproject.toml
+src/ffnn_metrics.egg-info/PKG-INFO
+src/ffnn_metrics.egg-info/SOURCES.txt
+src/ffnn_metrics.egg-info/dependency_links.txt
+src/ffnn_metrics.egg-info/requires.txt
+src/ffnn_metrics.egg-info/top_level.txt
+src/ffnnmetrics/analysis.py
+src/ffnnmetrics/data.py
+src/ffnnmetrics/metrics.py
+src/ffnnmetrics/models.py
+src/ffnnmetrics/plotting.py
+src/ffnnmetrics/training.py
