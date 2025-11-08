@@ -1,14 +1,14 @@
-run_name: 07_11/d30_k_7_depth4
+run_name: 08_11/d30_k_7_depth3_2_shuffle
 seed: 123
 
 
 # data
-train_size: 50000
+train_size: 80000
 test_size: 5000
-dim: 30
-spec: "{7}"
+dim: 50
+spec: "{8}"
 noise_std: 0.0
-shuffle_labels: false
+shuffle_labels: true
 
 
 # model
@@ -18,8 +18,8 @@ activation: relu
 
 
 # training
-epochs: 1000
-lr: 2.0e-3
+epochs: 10000
+lr: 5.0e-3
 optimizer: gd
 momentum: 0.0
 mode: gd # gd or sgd
@@ -32,9 +32,9 @@ device: cuda
 
 # kernel metrics
 compute_kernel: true
-compute_kernel_every: 5
+compute_kernel_every: 10
 kernel_set: train # train or test
-max_kernel_points: 25000
+max_kernel_points: 50000
 last_top_k: 15
 lower_top_k: 15
 betas: [0.2, 0.2, 0.2]

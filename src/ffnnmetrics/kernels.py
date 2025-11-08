@@ -164,3 +164,5 @@ def layerwise_feature_grams(model: MLP, X: torch.Tensor) -> Tuple[List[torch.Ten
     delta_list = layer_backprop_deltas(W_list, D_list, a_vec)
     C_bp  = [None] + [feature_gram(delta_list[ell]) for ell in range(1, len(delta_list))]
     return C_act, C_bp, fstate
+
+
