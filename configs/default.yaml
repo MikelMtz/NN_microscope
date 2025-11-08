@@ -1,29 +1,29 @@
-run_name: demo
+run_name: 07_11/d30_k_7_depth4
 seed: 123
 
 
 # data
-train_size: 15000
+train_size: 50000
 test_size: 5000
 dim: 30
-spec: "{1,2}+{1,2,3,4}+{8}"
+spec: "{7}"
 noise_std: 0.0
 shuffle_labels: false
 
 
 # model
 width: 256
-depth: 3
+depth: 4
 activation: relu
 
 
 # training
 epochs: 1000
-lr: 1.0e-3
+lr: 2.0e-3
 optimizer: gd
 momentum: 0.0
 mode: gd # gd or sgd
-batch_size: 2048
+batch_size: 
 
 
 # device
@@ -31,7 +31,7 @@ device: cuda
 
 
 # kernel metrics
-compute_kernel: false
+compute_kernel: true
 compute_kernel_every: 5
 kernel_set: train # train or test
 max_kernel_points: 25000

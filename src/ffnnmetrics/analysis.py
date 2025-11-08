@@ -10,6 +10,9 @@ def load_shares(run_dir: str) -> pd.DataFrame:
     return pd.read_csv(os.path.join(run_dir, "kernel", "shares.csv"))
 
 def load_top_eigs(run_dir: str, epoch: int):
-    e = f"epoch_{epoch:04d}"
-    p = os.path.join(run_dir, "kernel", e, "K_L_top_eigvals.npy")
+    """
+    Loads last-layer (feature-space) top eigenvalues for a given epoch.
+    New flat path: kernel/K_L_top_eigvals_epochXXXX.npy
+    """
+    p = os.path.join(run_dir, "kernel", f"K_L_top_eigvals_epoch{epoch:04d}.npy")
     return np.load(p)

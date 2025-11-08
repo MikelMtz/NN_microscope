@@ -1,6 +1,3 @@
-
-
-
 from __future__ import annotations
 import os, csv, random
 from dataclasses import dataclass
@@ -14,9 +11,6 @@ from torch.utils.data import DataLoader
 from .data import parse_interaction_spec, StaircaseDataset
 from .models import MLP
 from .metrics import make_kernel_cache, compute_and_log_all_metrics
-
-
-
 
 @dataclass
 class TrainConfig:
@@ -34,17 +28,14 @@ class TrainConfig:
     compute_kernel: bool; compute_kernel_every: int; kernel_set: str; max_kernel_points: int
     last_top_k: int; lower_top_k: int; betas: Tuple[float, float, float]; track_U: bool; save_transfers: bool
 
-
 def set_seed(seed: int):
     random.seed(seed); np.random.seed(seed)
     torch.manual_seed(seed); torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-
 def get_device(name: str) -> torch.device:
     return torch.device("cuda" if (name == "cuda" and torch.cuda.is_available()) else "cpu")
-
 
 def evaluate_mse(model: MLP, loader: DataLoader) -> float:
     model.eval(); loss_fn = nn.MSELoss()
@@ -55,12 +46,10 @@ def evaluate_mse(model: MLP, loader: DataLoader) -> float:
             b = xb.shape[0]; tot += float(loss.item()) * b; n += b
     return tot / max(n, 1)
 
-
 def load_config(path: str) -> TrainConfig:
     with open(path, "r") as f:
         cfg = yaml.safe_load(f)
     return TrainConfig(**cfg)
-
 
 def run_training(cfg: TrainConfig):
     device = get_device(cfg.device)
@@ -113,7 +102,6 @@ def run_training(cfg: TrainConfig):
             Xk, yk = Xset[idx], yset[idx]
         else:
             Xk, yk = Xset, yset
-        from .metrics import compute_and_log_all_metrics
         compute_and_log_all_metrics(
             out_dir=kernel_dir, model=model, X=Xk, y=yk, top_k=cfg.last_top_k, lower_top_k=cfg.lower_top_k,
             epoch=0, betas=cfg.betas, track_U=cfg.track_U, save_transfers=cfg.save_transfers, kernel_cache=kernel_cache
