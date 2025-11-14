@@ -125,22 +125,70 @@ def plot_rotation_per_layer(run_dir: str, out_path: str, which: str = "act", log
 
 def plot_alignment_per_layer(run_dir: str, out_path: str, logx: bool = True):
     p = os.path.join(run_dir, "kernel", "alignment.csv")
-    if not os.path.exists(p):
-        print(f"[plot_alignment_per_layer] missing {p}")
+    p_transport = os.path.join(run_dir, "kernel", "transported_alignment.csv")
+    
+    # Try to read alignment.csv first
+    if os.path.exists(p):
+        df = pd.read_csv(p)
+        # Check if we have data rows (not just headers)
+        if len(df) > 0 and "epoch" in df.columns:
+            x = df["epoch"].to_numpy()
+            cols = [c for c in df.columns if c.startswith("align_layer_")]
+            if cols:
+                fig = plt.figure(); ax = fig.add_subplot(111)
+                x_plot = x + 1 if logx else x
+                for c in cols:
+                    y = df[c].to_numpy()
+                    ax.plot(x_plot, y, label=c)
+                if logx: ax.set_xscale("log")
+                ax.set_xlabel("epoch" + (" (log)" if logx else ""))
+                ax.set_ylabel("alignment")
+                ax.legend(ncol=2, fontsize=8)
+                _save(fig, out_path)
+                return
+    
+    # Fallback: generate from transported_alignment.csv
+    if os.path.exists(p_transport):
+        df_transport = pd.read_csv(p_transport)
+        if df_transport.empty:
+            print(f"[plot_alignment_per_layer] transported_alignment.csv is empty")
+            return
+        
+        # Get number of layers from the data
+        L = int(df_transport["r"].max())
+        
+        # Group by epoch and extract alignments to last layer (r == L)
+        epochs = sorted(df_transport["epoch"].unique())
+        align_data = {"epoch": epochs}
+        
+        for ell in range(1, L + 1):
+            align_data[f"align_layer_{ell}"] = []
+            for epoch in epochs:
+                sub = df_transport[(df_transport["epoch"] == epoch) & 
+                                   (df_transport["ell"] == ell) & 
+                                   (df_transport["r"] == L)]
+                if not sub.empty:
+                    align_data[f"align_layer_{ell}"].append(float(sub.iloc[0]["A_transport"]))
+                else:
+                    align_data[f"align_layer_{ell}"].append(0.0)
+        
+        df = pd.DataFrame(align_data)
+        fig = plt.figure(); ax = fig.add_subplot(111)
+        x = df["epoch"].to_numpy()
+        x_plot = x + 1 if logx else x
+        cols = [c for c in df.columns if c.startswith("align_layer_")]
+        for c in cols:
+            y = df[c].to_numpy()
+            ax.plot(x_plot, y, label=c)
+        if logx: ax.set_xscale("log")
+        ax.set_xlabel("epoch" + (" (log)" if logx else ""))
+        ax.set_ylabel("alignment")
+        ax.legend(ncol=2, fontsize=8)
+        _save(fig, out_path)
         return
-    df = pd.read_csv(p)
-    fig = plt.figure(); ax = fig.add_subplot(111)
-    x = df["epoch"].to_numpy()
-    x_plot = x + 1 if logx else x
-    cols = [c for c in df.columns if c.startswith("align_layer_")]
-    for c in cols:
-        y = df[c].to_numpy()
-        ax.plot(x_plot, y, label=c)
-    if logx: ax.set_xscale("log")
-    ax.set_xlabel("epoch" + (" (log)" if logx else ""))
-    ax.set_ylabel("alignment")
-    ax.legend(ncol=2, fontsize=8)
-    _save(fig, out_path)
+    
+    print(f"[plot_alignment_per_layer] missing {p} and {p_transport}")
+    return
 
 def plot_transfer_inflow_topk_per_layer(run_dir: str, out_dir: str):
     epochs = _epochs_from_summary(run_dir)
@@ -403,6 +451,7 @@ def plot_interlayer_entropy_coherence_timeseries(run_dir: str, out_path: str):
     for c in cols:
         ax.plot(grouped["epoch"], grouped[c], label=f"mean {c}")
     ax.set_xlabel("epoch"); ax.set_ylabel("value")
+
     ax.legend()
     _save(fig, out_path)
 
@@ -502,6 +551,9 @@ def plot_interlayer_metric_timeseries_grouped(
     handles = []
     labels = []
 
+    metrics_loglog = {"ILARD", "R_inflow", "I_GSI"}
+    use_log = metric in metrics_loglog
+
     for ell in range(1, L + 1):
         targets = group_targets[ell]
         n_shades = max(1, len(targets))
@@ -514,14 +566,26 @@ def plot_interlayer_metric_timeseries_grouped(
             if sub.empty:
                 continue
             x = sub["epoch"].to_numpy()
+            if use_log:
+                x_plot = x + 1
+            else:
+                x_plot = x
             y = sub[metric].to_numpy()
+            if use_log:
+                y = np.clip(y, 1e-12, None)
             if y.size < min_points:
                 continue
-            h, = ax.plot(x, y, color=color, linewidth=1.6)
+            h, = ax.plot(x_plot, y, color=color, linewidth=1.6)
             handles.append(h); labels.append(f"ℓ={ell}→r={r}")
 
-    ax.set_xlabel("epoch")
-    ax.set_ylabel(metric)
+    if use_log:
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel("epoch (log)")
+        ax.set_ylabel(f"{metric} (log)")
+    else:
+        ax.set_xlabel("epoch")
+        ax.set_ylabel(metric)
     ax.set_title(f"Inter-layer {metric} vs epoch (grouped by source layer ℓ)")
     if legend and handles:
         ax.legend(handles, labels, ncol=3, fontsize=8, frameon=False)

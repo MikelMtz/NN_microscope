@@ -8,9 +8,21 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from .data import parse_interaction_spec, StaircaseDataset
+from .data import (
+    parse_interaction_spec,
+    StaircaseDataset,
+    parse_tree_spec,
+    ProductTreeDataset,
+    MNISTDataset,
+    RotMNISTDataset,
+)
+
+
 from .models import MLP
 from .metrics import make_kernel_cache, compute_and_log_all_metrics
+
+from dataclasses import dataclass
+from typing import Tuple
 
 @dataclass
 class TrainConfig:
@@ -18,15 +30,23 @@ class TrainConfig:
     seed: int
     # data
     train_size: int; test_size: int; dim: int; spec: str; noise_std: float; shuffle_labels: bool
+    dataset: str = "staircase"  # <— NEW: choose "staircase" or "product_tree"
     # model
-    width: int; depth: int; activation: str
+    width: int = 256; depth: int = 4; activation: str = "relu"
     # training
-    epochs: int; lr: float; optimizer: str; momentum: float; mode: str; batch_size: int
+    epochs: int = 10000; lr: float = 5e-3; optimizer: str = "gd"; momentum: float = 0.0; mode: str = "gd"
+    batch_size: int | None = None
     # device
-    device: str
+    device: str = "cuda"
     # kernel
-    compute_kernel: bool; compute_kernel_every: int; kernel_set: str; max_kernel_points: int
-    last_top_k: int; lower_top_k: int; betas: Tuple[float, float, float]; track_U: bool; save_transfers: bool
+    compute_kernel: bool = True; compute_kernel_every: int = 10; kernel_set: str = "train"
+    max_kernel_points: int = 50000
+    last_top_k: int = 15; lower_top_k: int = 15
+    betas: Tuple[float, float, float] = (0.2, 0.2, 0.2)
+    track_U: bool = True; save_transfers: bool = True
+
+
+
 
 def set_seed(seed: int):
     random.seed(seed); np.random.seed(seed)
@@ -49,7 +69,10 @@ def evaluate_mse(model: MLP, loader: DataLoader) -> float:
 def load_config(path: str) -> TrainConfig:
     with open(path, "r") as f:
         cfg = yaml.safe_load(f)
+    cfg.setdefault("dataset", "staircase")  # <— default keeps old configs working
     return TrainConfig(**cfg)
+
+
 
 def run_training(cfg: TrainConfig):
     device = get_device(cfg.device)
@@ -61,12 +84,78 @@ def run_training(cfg: TrainConfig):
     results_dir = os.path.join("results", cfg.run_name)
     os.makedirs(results_dir, exist_ok=True)
 
-    interactions = parse_interaction_spec(cfg.spec)
-    need_dim = max([i for t in interactions for i in t]) + 1
-    assert cfg.dim >= need_dim, f"dim={cfg.dim} < required {need_dim}"
+    # --- DATASETS: choose by cfg.dataset ---
+    if cfg.dataset.lower() == "product_tree":
+        params = parse_tree_spec(cfg.spec)  # e.g. "tree(k=32, r=2, d=5, inputs=uniform)"
+        k, r, depth = params["k"], params["r"], params["d"]
+        input_mode = params["inputs"]
+        assert cfg.dim >= k, f"dim={cfg.dim} < required k={k}"
 
-    train_ds = StaircaseDataset(cfg.train_size, cfg.dim, interactions, device, cfg.noise_std, cfg.seed)
-    test_ds  = StaircaseDataset(cfg.test_size,  cfg.dim, interactions, device, 0.0, cfg.seed + 1)
+        train_ds = ProductTreeDataset(cfg.train_size, cfg.dim, k=k, r=r, depth=depth,
+                                    device=device, noise_std=cfg.noise_std, seed=cfg.seed,
+                                    input_dist=input_mode)
+        test_ds  = ProductTreeDataset(cfg.test_size,  cfg.dim, k=k, r=r, depth=depth,
+                                    device=device, noise_std=0.0, seed=cfg.seed+1,
+                                    input_dist=input_mode)
+
+    elif cfg.dataset.lower() == "staircase":
+        interactions = parse_interaction_spec(cfg.spec)
+        need_dim = max([i for t in interactions for i in t]) + 1
+        assert cfg.dim >= need_dim, f"dim={cfg.dim} < required {need_dim}"
+        train_ds = StaircaseDataset(cfg.train_size, cfg.dim, interactions, device, cfg.noise_std, cfg.seed)
+        test_ds  = StaircaseDataset(cfg.test_size,  cfg.dim, interactions, device, 0.0, cfg.seed + 1)
+
+    elif cfg.dataset.lower() == "mnist":
+        # MNIST images are 28x28 = 784 dimensions
+        # If dim is not 784, it will be handled by the dataset (padding or truncation)
+        # spec is not used for MNIST but required for interface compatibility
+        train_ds = MNISTDataset(
+            n=cfg.train_size,
+            d=cfg.dim,
+            spec=cfg.spec,  # Not used, but kept for interface
+            device=device,
+            noise_std=cfg.noise_std,
+            seed=cfg.seed,
+            train=True
+        )
+        test_ds = MNISTDataset(
+            n=cfg.test_size,
+            d=cfg.dim,
+            spec=cfg.spec,  # Not used, but kept for interface
+            device=device,
+            noise_std=0.0,
+            seed=cfg.seed + 1,
+            train=False
+        )
+
+    elif cfg.dataset.lower() == "rotmnist":
+        # Rotated MNIST - same as MNIST but with rotations
+        # spec is not used for RotMNIST but required for interface compatibility
+        train_ds = RotMNISTDataset(
+            n=cfg.train_size,
+            d=cfg.dim,
+            spec=cfg.spec,  # Not used, but kept for interface
+            device=device,
+            noise_std=cfg.noise_std,
+            seed=cfg.seed,
+            train=True
+        )
+        test_ds = RotMNISTDataset(
+            n=cfg.test_size,
+            d=cfg.dim,
+            spec=cfg.spec,  # Not used, but kept for interface
+            device=device,
+            noise_std=0.0,
+            seed=cfg.seed + 1,
+            train=False
+        )
+
+    else:
+        raise ValueError(f"Unknown dataset '{cfg.dataset}'. Use 'staircase', 'product_tree', 'mnist', or 'rotmnist'.")
+
+
+
+
 
     if cfg.shuffle_labels:
         idx = torch.randperm(train_ds.y.shape[0], device=train_ds.y.device)

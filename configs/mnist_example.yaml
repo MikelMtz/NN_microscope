@@ -1,0 +1,39 @@
+run_name: mnist_example
+seed: 123
+
+# data
+train_size: 60000  # Full MNIST training set
+test_size: 10000   # Full MNIST test set
+dim: 784           # MNIST images are 28x28 = 784
+spec: ""           # Not used for MNIST, but required
+noise_std: 0.0
+shuffle_labels: false
+dataset: mnist     # Use MNIST dataset
+
+# model
+width: 256
+depth: 4
+activation: relu
+
+# training
+epochs: 100
+lr: 1.0e-3
+optimizer: adam
+momentum: 0.0
+mode: sgd
+batch_size: 128
+
+# device
+device: cuda
+
+# kernel metrics
+compute_kernel: true
+compute_kernel_every: 10
+kernel_set: train
+max_kernel_points: 10000
+last_top_k: 15
+lower_top_k: 15
+betas: [0.2, 0.2, 0.2]
+track_U: true
+save_transfers: true
+

@@ -1047,14 +1047,16 @@ def compute_and_log_all_metrics(
             w.writerow(["epoch"] + [f"rho_bp_layer_{ell}" for ell in range(1, L + 1)])
         w.writerow([epoch] + rho_bp)
 
-    # Alignment CSV (unchanged header logic; populate with your existing numbers if needed)
+    # Alignment CSV: per-layer alignment with last layer
     align_csv = os.path.join(out_dir, "alignment.csv")
     header_exists = os.path.exists(align_csv) and os.path.getsize(align_csv) > 0
     with open(align_csv, "a", newline="") as fal:
         w = csv.writer(fal)
         if not header_exists:
             w.writerow(["epoch"] + [f"align_layer_{ell}" for ell in range(1, L + 1)])
-        # keep previous behavior or compute here as desired
+        # Alignment of each layer with the last layer: A(ell -> L)
+        align_values = [A_transport.get((ell, L), 0.0) for ell in range(1, L + 1)]
+        w.writerow([epoch] + align_values)
 
     # NEW: last-layer advanced metrics CSV
     adv_csv = os.path.join(out_dir, "lastlayer_advanced.csv")

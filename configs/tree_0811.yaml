@@ -1,0 +1,38 @@
+run_name: 08_11/product_tree_d60_k25_r5_NN_d2
+seed: 123
+
+# data
+train_size: 40000
+test_size: 5000
+dim: 60
+spec: "tree(k=25, r=5, d=5, inputs=uniform)"  # binary uniform
+noise_std: 0.0
+shuffle_labels: false
+dataset: product_tree
+
+# model
+width: 512
+depth: 2
+activation: relu
+
+# training
+epochs: 4000
+lr: 5.0e-4
+optimizer: gd
+momentum: 0.0
+mode: gd
+batch_size:
+
+# device
+device: cuda
+
+# kernel metrics (unchanged)
+compute_kernel: true
+compute_kernel_every: 1
+kernel_set: train
+max_kernel_points: 50000
+last_top_k: 15
+lower_top_k: 15
+betas: [0.2, 0.2, 0.2]
+track_U: true
+save_transfers: true
