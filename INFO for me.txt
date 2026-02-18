@@ -1,0 +1,47 @@
+CHANGE DEPTH
+To run for different epochs/depth/width we need to change the following files:
+
+configs/mnist_example.yaml
+
+line 1      run_name
+line 13     model specifications
+line 18     training specifications
+
+configs/default.yaml
+
+line 14     model specifications
+line 20     training specifications
+
+scripts/plot_all.py
+
+line 24     "results_LX_epochsY/<run> directory or name"
+line 28     "results_LX_epochsY"
+
+src/ffnnmetrics/training.py
+
+line 84     "results_LX_epochsY"
+
+________________________________________________________________
+
+RUN IN THE CLUSTER
+
+command 'showgpus' for visualising which gpus are available
+
+submit a job by:
+
+addqueue -q gpuQueueYouChose -s --gpus numberGPUs --gputype SpecifyTheType -m GPUs[Free/Tot] ./yourProgram,
+addqueue -q gpulong -s --gpus 1 --gputype rtx2080with12gb ./myProgram
+    or
+addqueue -q gpulong -s -m 4 --gpus 1 ./myProgram
+    (if you don't mind which GPU you get)
+
+I USED: addqueue -q gpulong -s --gpus 1 --gputype rtx4090with24gb ./submitjob.sh
+
+    check run with: sacct -j 'id'
+
+________________________________________________________________
+
+MAIN SUBMIT
+python scripts/train.py --config configs/mnist_example.yaml
+
+python scripts/plot_all.py --run (results\)mnist_example --outdir plots/mnist_example
