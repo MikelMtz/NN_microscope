@@ -43,7 +43,7 @@ def eigendecompose_symmetric(C: torch.Tensor, top_k: int) -> Tuple[np.ndarray, n
 # -----------------------------------------
 # Forward state (used by metrics & kernels)
 # -----------------------------------------
-
+ 
 @torch.no_grad()
 def collect_forward_state(model: nn.Module, X: torch.Tensor) -> Dict[str, List[torch.Tensor]]:
     """
@@ -80,7 +80,9 @@ def collect_forward_state(model: nn.Module, X: torch.Tensor) -> Dict[str, List[t
             x = act_fn(u)
             h_list.append(x)
 
-        a_vec = model.out.weight.squeeze(0)
+        # Before using cross_entropy
+        #a_vec = model.out.weight.squeeze(0) # the one BEFORE
+        a_vec = model.out.weight.t()  # Transpose to ensure correct shape for matrix multiplication
         b_out = model.out.bias.squeeze(0) if model.out.bias is not None else torch.tensor(0., device=device, dtype=dtype)
         f = (x @ a_vec) + b_out
         return dict(h_list=h_list, u_list=u_list, D_list=D_list, W_list=W_list, a_vec=a_vec, f=f)
@@ -133,7 +135,11 @@ def layer_backprop_deltas(W_list: List[torch.Tensor], D_list: List[torch.Tensor]
     device = D_list[0].device
 
     delta_list: List[torch.Tensor] = [None] * (L + 1)
-    delta_L = D_list[-1] * a_vec.to(device=device, dtype=dtype).unsqueeze(0)
+    # Before using cross_entropy
+    #delta_L = D_list[-1] * a_vec.to(device=device, dtype=dtype).unsqueeze(0) # Before 
+    # Adjust a_vec to match the shape of D_list[-1]
+    a_vec_expanded = a_vec.unsqueeze(0).expand(D_list[-1].size(0), -1)
+    delta_L = D_list[-1] * a_vec_expanded.to(device=device, dtype=dtype)
     delta_list[L] = delta_L
     for ell in range(L - 1, 0, -1):
         delta_next = delta_list[ell + 1]                 # [N, m_{ell+1}]

@@ -1,7 +1,9 @@
-import argparse, os
+import argparse, os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 from ffnnmetrics.plotting import (
     # existing
     plot_training_mse,
+    plot_training_accuracy,
     plot_kernel_scalars,
     plot_layer_shares,
     plot_rotation_per_layer,
@@ -21,15 +23,16 @@ from ffnnmetrics.plotting import (
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run", type=str, required=True, help="results/<run> directory or name")
+    ap.add_argument("--run", type=str, required=True, help="results_L30_epochs10000/<run> directory or name")
     ap.add_argument("--outdir", type=str, default="plots")
     args = ap.parse_args()
 
-    run_dir = args.run if os.path.isdir(args.run) else os.path.join("results", args.run)
+    run_dir = args.run if os.path.isdir(args.run) else os.path.join("results_L30_epochs10000", args.run)
     os.makedirs(args.outdir, exist_ok=True)
 
     # Basic
     plot_training_mse(run_dir, os.path.join(args.outdir, "mse.png"))
+    plot_training_accuracy(run_dir, os.path.join(args.outdir, "accuracy.png"))
     plot_kernel_scalars(run_dir, os.path.join(args.outdir, "kernel_scalars.png"))
     plot_layer_shares(run_dir, os.path.join(args.outdir, "shares.png"))
 

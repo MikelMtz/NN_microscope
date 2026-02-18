@@ -2,11 +2,11 @@ run_name: 08_11/d30_k_7_depth3_2_shuffle
 seed: 123
 
 
-# data
+# data, spec={5}
 train_size: 80000
 test_size: 5000
 dim: 50
-spec: "{8}"
+spec: "{1,2,3,4,5}"
 noise_std: 0.0
 shuffle_labels: true
 
@@ -18,7 +18,7 @@ activation: relu
 
 
 # training
-epochs: 10000
+epochs: 100
 lr: 5.0e-3
 optimizer: gd
 momentum: 0.0

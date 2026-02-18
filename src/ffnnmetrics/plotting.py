@@ -59,6 +59,18 @@ def _latest_epoch_from_npy(pattern: str) -> tuple[int | None, str | None]:
     return best_e, best_f
 
 # ---------------- basic plots (unchanged + small improvements) ----------------
+def plot_training_accuracy(run_dir: str, out_path: str):
+    p = os.path.join(run_dir, "metrics.csv")
+    if not os.path.exists(p):
+        print(f"[plot_training_accuracy] missing {p}")
+        return
+    df = pd.read_csv(p)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(df["epoch"], df["train_acc"], label="train")
+    ax.plot(df["epoch"], df["test_acc"], label="test")
+    ax.set_xlabel("epoch"); ax.set_ylabel("Accuracy"); ax.legend()
+    _save(fig, out_path)
 
 def plot_training_mse(run_dir: str, out_path: str):
     p = os.path.join(run_dir, "metrics.csv")
@@ -231,6 +243,11 @@ def plot_transfer_inflow_topk_per_layer(run_dir: str, out_dir: str):
         cbar.set_label("mode index")
         _save(fig, os.path.join(out_dir, f"transfer_inflow_layer{ell}.png"))
 
+##########################################
+#    Takes as argument:                  #
+#                                        #
+#    C_act_eigvals_layerX_epochYYYY.npy  #
+##########################################
 def plot_eigenvalues_over_epochs_per_layer(run_dir: str, out_dir: str, which: str = "act"):
     epochs = _epochs_from_summary(run_dir)
     if epochs.size == 0:
@@ -605,13 +622,6 @@ def plot_all_interlayer_metrics_grouped_timeseries(run_dir: str, out_dir: str):
             metric=m
         )
 
-
-
-
-
-
-
-
 def plot_interlayer_heatmaps_over_time(
     run_dir: str,
     out_dir: str,
@@ -700,6 +710,3 @@ def plot_interlayer_heatmaps_over_time(
         cbar = fig.colorbar(im, ax=axes, pad=0.01, fraction=0.02)
         cbar.set_label(mcol)
         _save(fig, os.path.join(out_dir, f"{mcol.lower()}_timeline.png"))
-
-
-

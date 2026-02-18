@@ -1,0 +1,37 @@
+run_name: svhn_L4_epoch200_try
+seed: 42
+
+# data
+data_dir: data/SVHN/raw
+dataset: svhn
+train_size: 73257
+test_size: 26032
+dim: 3072           # Adjust if necessary
+
+# training
+epochs: 200
+lr: 0.001           # learning rate
+model: MLP          # Or ResNet18
+mode: sgd
+#optimizer: sgd     # don't use adam (Niclas)
+momentum: 0.0       # =0.0 no momentum applied, normal values are 0.9,0.99
+batch_size: 128
+
+
+report_accuracy: true # always compute & report accuracy (train & test)
+weight_decay: 0.0   # keep no explicit weight decay unless you want it
+
+
+# model
+width: 512
+depth: 4
+activation: relu
+num_classes: 10
+
+# device
+device: cuda
+
+#other
+spec: ""              # Provide a default or meaningful value if required
+noise_std: 0.0        # Standard deviation of noise (set to 0.0 if not needed)
+shuffle_labels: false # Whether to shuffle labels (set to false if not needed)

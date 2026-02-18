@@ -1,8 +1,10 @@
-
 from __future__ import annotations
 import torch
 import torch.nn as nn
 from typing import List, Dict, Tuple
+
+# Import torchvision for ResNet18 (NEW model)
+import torchvision.models as models
 
 class MLP(nn.Module):
     """
@@ -10,10 +12,10 @@ class MLP(nn.Module):
     Exposes forward caches (preacts a_l, activations h_l) and backprop errors δ_l.
     h0=x; a_l=W_l h_{l-1}+b_l; h_l=act(a_l); f=v^T h_L + b_out.
     """
-    def __init__(self, d_in: int, width: int, depth: int, activation: str = "silu"):
+    def __init__(self, d_in: int, width: int, depth: int, activation: str = "silu", num_classes: int = 10):
         super().__init__()
         assert depth >= 1, "depth must be >= 1"
-        self.d_in, self.width, self.depth = d_in, width, depth
+        self.d_in, self.width, self.depth, self.num_classes = d_in, width, depth, num_classes
         self.act_name = activation.lower()
         self.act = {
             "relu": nn.ReLU(),
@@ -28,7 +30,7 @@ class MLP(nn.Module):
             layers.append(nn.Linear(in_dim, width, bias=True))
             in_dim = width
         self.hidden = nn.ModuleList(layers)
-        self.out = nn.Linear(width, 1, bias=True)
+        self.out = nn.Linear(width, num_classes, bias=True)  # Updated to output logits for all classes
 
         for lin in self.hidden:
             if self.act_name in ("relu", "silu", "gelu"):
@@ -82,4 +84,14 @@ class MLP(nn.Module):
             params.append((lin.weight, lin.bias))
         params.append((self.out.weight, self.out.bias))
         return params
+
+# New ResNet18 model for classification
+class ResNet18(nn.Module):
+    def __init__(self, num_classes: int = 10):
+        super().__init__()
+        self.model = models.resnet18(pretrained=False)
+        self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.model(x)
 

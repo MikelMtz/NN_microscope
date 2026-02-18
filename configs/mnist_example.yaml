@@ -1,4 +1,4 @@
-run_name: mnist_example
+run_name: mnist_example_L30_epochs10000
 seed: 123
 
 # data
@@ -16,7 +16,7 @@ depth: 4
 activation: relu
 
 # training
-epochs: 100
+epochs: 1000
 lr: 1.0e-3
 optimizer: adam
 momentum: 0.0

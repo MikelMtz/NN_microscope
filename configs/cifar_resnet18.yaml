@@ -1,0 +1,22 @@
+run_name: cifar_resnet18
+seed: 42
+
+# Data configuration
+dataset: cifar
+train_size: 50000
+test_size: 10000
+dim: 3
+num_classes: 10
+
+# Model configuration
+model: ResNet18
+
+# Training configuration
+epochs: 100
+lr: 0.01
+optimizer: adam
+batch_size: 128
+device: cuda
+
+# Kernel configuration
+compute_kernel: False

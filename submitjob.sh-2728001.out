@@ -1,0 +1,202 @@
+=========================================================
+Job submitted date = Tue 10 Feb 10:39:21 GMT 2026
+1 nodes ( 1 processes per node )
+1 hosts used: gpu02
+Job output begins
+-----------------
+
+/mnt/users/garridom/.local/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/mnt/users/garridom/.local/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+Traceback (most recent call last):
+  File "/mnt/newusers/garridom/NN_microscope_regul/scripts/train.py", line 15, in <module>
+    run_training(cfg)
+  File "/mnt/users/garridom/NN_microscope_regul/src/ffnnmetrics/training.py", line 304, in run_training
+    tr_loss0 = evaluate_loss(model, DataLoader(train_ds, batch_size=4096, shuffle=False), cfg.loss)
+  File "/mnt/users/garridom/NN_microscope_regul/src/ffnnmetrics/training.py", line 84, in evaluate_loss
+    pred = model(xb)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 414, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 832, in compile_wrapper
+    return fn(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1875, in __call__
+    result = self._torchdynamo_orig_backend(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1625, in __call__
+    result = self._inner_convert(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 688, in __call__
+    result = _compile(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1434, in _compile
+    guarded_code, tracer_output = compile_inner(code, one_graph, hooks)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_utils_internal.py", line 92, in wrapper_function
+    return function(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1117, in compile_inner
+    return _compile_inner(code, one_graph, hooks)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1151, in _compile_inner
+    dynamo_output = compile_frame(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1032, in compile_frame
+    bytecode, tracer_output = transform_code_object(code, transform)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/bytecode_transformation.py", line 1592, in transform_code_object
+    tracer_output = transformations(instructions, code_options)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 1004, in transform
+    tracer_output = trace_frame(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 312, in _fn
+    return fn(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 815, in trace_frame
+    run_tracer()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/convert_frame.py", line 797, in run_tracer
+    tracer.run()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1500, in run
+    while self.step():
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1348, in step
+    self.dispatch_table[inst.opcode](self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 904, in wrapper
+    return inner_fn(self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 2333, in CALL_FUNCTION
+    self.call_function(fn, args, {})
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1266, in call_function
+    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/lazy.py", line 212, in realize_and_forward
+    return getattr(self.realize(), name)(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/nn_module.py", line 1010, in call_function
+    return variables.UserFunctionVariable(fn, source=source).call_function(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 598, in call_function
+    return super().call_function(tx, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 342, in call_function
+    return tx.inline_user_function_return(self, [*self.self_args(), *args], kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1288, in inline_user_function_return
+    return InliningInstructionTranslator.inline_call(self, fn, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4129, in inline_call
+    return tracer.inline_call_()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4332, in inline_call_
+    self.run()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1500, in run
+    while self.step():
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1348, in step
+    self.dispatch_table[inst.opcode](self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 904, in wrapper
+    return inner_fn(self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 2333, in CALL_FUNCTION
+    self.call_function(fn, args, {})
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1266, in call_function
+    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 1154, in call_function
+    return super().call_function(tx, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 598, in call_function
+    return super().call_function(tx, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 342, in call_function
+    return tx.inline_user_function_return(self, [*self.self_args(), *args], kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1288, in inline_user_function_return
+    return InliningInstructionTranslator.inline_call(self, fn, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4129, in inline_call
+    return tracer.inline_call_()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4332, in inline_call_
+    self.run()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1500, in run
+    while self.step():
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1348, in step
+    self.dispatch_table[inst.opcode](self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 904, in wrapper
+    return inner_fn(self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 2333, in CALL_FUNCTION
+    self.call_function(fn, args, {})
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1266, in call_function
+    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/lazy.py", line 212, in realize_and_forward
+    return getattr(self.realize(), name)(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/nn_module.py", line 1010, in call_function
+    return variables.UserFunctionVariable(fn, source=source).call_function(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 598, in call_function
+    return super().call_function(tx, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 342, in call_function
+    return tx.inline_user_function_return(self, [*self.self_args(), *args], kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1288, in inline_user_function_return
+    return InliningInstructionTranslator.inline_call(self, fn, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4129, in inline_call
+    return tracer.inline_call_()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4332, in inline_call_
+    self.run()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1500, in run
+    while self.step():
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1348, in step
+    self.dispatch_table[inst.opcode](self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 904, in wrapper
+    return inner_fn(self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 2333, in CALL_FUNCTION
+    self.call_function(fn, args, {})
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1266, in call_function
+    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 1154, in call_function
+    return super().call_function(tx, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 598, in call_function
+    return super().call_function(tx, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/functions.py", line 342, in call_function
+    return tx.inline_user_function_return(self, [*self.self_args(), *args], kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1288, in inline_user_function_return
+    return InliningInstructionTranslator.inline_call(self, fn, args, kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4129, in inline_call
+    return tracer.inline_call_()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 4332, in inline_call_
+    self.run()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1500, in run
+    while self.step():
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1348, in step
+    self.dispatch_table[inst.opcode](self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 904, in wrapper
+    return inner_fn(self, inst)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 2333, in CALL_FUNCTION
+    self.call_function(fn, args, {})
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/symbolic_convert.py", line 1266, in call_function
+    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/lazy.py", line 212, in realize_and_forward
+    return getattr(self.realize(), name)(*args, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/torch.py", line 1516, in call_function
+    tensor_variable = wrap_fx_proxy(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/builder.py", line 2645, in wrap_fx_proxy
+    return wrap_fx_proxy_cls(target_cls=TensorVariable, **kwargs)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/builder.py", line 2711, in wrap_fx_proxy_cls
+    return _wrap_fx_proxy(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/variables/builder.py", line 2809, in _wrap_fx_proxy
+    example_value = get_fake_value(proxy.node, tx, allow_non_graph_fake=True)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 3478, in get_fake_value
+    raise TorchRuntimeError(str(e)).with_traceback(e.__traceback__) from None
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 3376, in get_fake_value
+    ret_val = wrap_fake_exception(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 2864, in wrap_fake_exception
+    return fn()
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 3377, in <lambda>
+    lambda: run_node(tx.output, node, args, kwargs, nnmodule)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 3587, in run_node
+    raise RuntimeError(make_error_message(e)).with_traceback(
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 3546, in run_node
+    return node.target(*args, **kwargs)  # type: ignore[operator]
+torch._dynamo.exc.TorchRuntimeError: Dynamo failed to run FX node with fake tensors: call_function <built-in method conv2d of type object at 0x7fb7747fda00>(*(FakeTensor(..., device='cuda:0', size=(4096, 32)), Parameter(FakeTensor(..., device='cuda:0', size=(64, 3, 7, 7), requires_grad=True)), None, (2, 2), (3, 3), (1, 1), 1), **{}): got RuntimeError('Expected 3D (unbatched) or 4D (batched) input to conv2d, but got input of size: [4096, 32]')
+
+from user code:
+   File "/mnt/users/garridom/NN_microscope_regul/src/ffnnmetrics/models.py", line 96, in forward
+    return self.model(x)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 285, in forward
+    return self._forward_impl(x)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 268, in _forward_impl
+    x = self.conv1(x)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 548, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/mnt/users/garridom/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 543, in _conv_forward
+    return F.conv2d(
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+
+---------------
+Job output ends
+=========================================================
+PBS job: finished date = Tue 10 Feb 10:41:24 GMT 2026
+Total run time : 0 Hours 2 Minutes 2 Seconds
+=========================================================

@@ -44,19 +44,6 @@ def compute_labels(x: torch.Tensor, interactions: List[List[int]]) -> torch.Tens
         y += torch.prod(x[:, term], dim=1)
     return y.unsqueeze(1)
 
-class StaircaseDataset(Dataset):
-    def __init__(self, n: int, d: int, interactions: List[List[int]], device: torch.device, noise_std: float = 0.0, seed: int = 0):
-        _ = seed
-        self.x = generate_inputs(n, d, device)
-        self.y = compute_labels(self.x, interactions)
-        if noise_std > 0:
-            self.y = self.y + noise_std * torch.randn_like(self.y)
-        self.n = n
-    def __len__(self): return self.n
-    def __getitem__(self, idx: int): return self.x[idx], self.y[idx]
-
-
-
 
 # --- NEW: parser for strings like "tree(k=32, r=2, d=5, inputs=uniform)" ---
 def parse_tree_spec(spec: str) -> dict:
@@ -118,6 +105,18 @@ def compute_product_tree_labels(x: torch.Tensor, k: int, r: int = 2, d: int | No
     Z = x.index_select(dim=1, index=idx)
     root = _product_tree_reduce(Z, r=r)
     return root.unsqueeze(1)
+
+class StaircaseDataset(Dataset):
+    def __init__(self, n: int, d: int, interactions: List[List[int]], device: torch.device, noise_std: float = 0.0, seed: int = 0):
+        _ = seed
+        self.x = generate_inputs(n, d, device)
+        self.y = compute_labels(self.x, interactions)
+        if noise_std > 0:
+            self.y = self.y + noise_std * torch.randn_like(self.y)
+        self.n = n
+    def __len__(self): return self.n
+    def __getitem__(self, idx: int): return self.x[idx], self.y[idx]
+
 
 class ProductTreeDataset(Dataset):
     def __init__(
@@ -306,5 +305,158 @@ class RotMNISTDataset(Dataset):
         
         self.n = len(self.x)
     
+    def __len__(self): return self.n
+    def __getitem__(self, idx: int): return self.x[idx], self.y[idx]
+
+
+class CIFAR10Dataset(Dataset):
+    """
+    CIFAR-10 dataset wrapped to match the interface of other datasets.
+    Flattens 32x32x3 images to 3072-dim vectors and converts labels to float regression targets.
+    """
+    def __init__(
+        self,
+        n: int,
+        d: int,  # Should be 3072 for CIFAR-10 (32*32*3), but we'll use it if provided
+        spec: str,  # Not used for CIFAR-10, but kept for interface compatibility
+        device: torch.device,
+        noise_std: float = 0.0,
+        seed: int = 0,
+        train: bool = True,
+    ):
+        _ = spec  # Not used for CIFAR-10
+        self.device = device
+        self.n = n
+
+        # Load CIFAR-10 data
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))  # CIFAR-10 mean and std
+        ])
+
+        # Use a fixed seed for reproducibility
+        if seed is not None:
+            torch.manual_seed(seed)
+
+        cifar10_dataset = datasets.CIFAR10(
+            root="./data",
+            train=train,
+            download=True,
+            transform=transform
+        )
+
+        # Sample n examples (or use all if n is larger than dataset size)
+        if n > len(cifar10_dataset):
+            indices = torch.arange(len(cifar10_dataset))
+        else:
+            g = torch.Generator()
+            g.manual_seed(seed)
+            indices = torch.randperm(len(cifar10_dataset), generator=g)[:n]
+
+        # Load data
+        images = []
+        labels = []
+        for idx in indices:
+            img, label = cifar10_dataset[int(idx)]
+            images.append(img.flatten())  # Flatten 32x32x3 to 3072
+            labels.append(float(label))  # Convert to float for regression
+
+        self.x = torch.stack(images).to(device=device, dtype=torch.float32)
+        self.y = torch.tensor(labels, device=device, dtype=torch.float32).unsqueeze(1)
+
+        # Handle dimension mismatch: if d != 3072, we'll pad or truncate
+        if d != 3072:
+            if d > 3072:
+                # Pad with zeros
+                padding = torch.zeros(self.x.shape[0], d - 3072, device=device, dtype=torch.float32)
+                self.x = torch.cat([self.x, padding], dim=1)
+            else:
+                # Truncate
+                self.x = self.x[:, :d]
+
+        if noise_std > 0:
+            g = torch.Generator(device=device)
+            g.manual_seed(seed)
+            self.y = self.y + noise_std * torch.randn_like(self.y, generator=g)
+
+        self.n = len(self.x)
+
+    def __len__(self): return self.n
+    def __getitem__(self, idx: int): return self.x[idx], self.y[idx]
+
+
+class SVHNDataset(Dataset):
+    """
+    SVHN dataset wrapped to match the interface of other datasets.
+    Flattens 32x32x3 images to 3072-dim vectors and converts labels to float regression targets.
+    """
+    def __init__(
+        self,
+        n: int,
+        d: int,  # Should be 3072 for SVHN (32*32*3), but we'll use it if provided
+        spec: str,  # Not used for SVHN, but kept for interface compatibility
+        device: torch.device,
+        noise_std: float = 0.0,
+        seed: int = 0,
+        train: bool = True,
+    ):
+        _ = spec  # Not used for SVHN
+        self.device = device
+        self.n = n
+
+        # Load SVHN data
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4377, 0.4438, 0.4728), (0.198, 0.201, 0.197))  # SVHN mean and std
+        ])
+
+        # Use a fixed seed for reproducibility
+        if seed is not None:
+            torch.manual_seed(seed)
+
+        split = 'train' if train else 'test'
+        svhn_dataset = datasets.SVHN(
+            root="./data",
+            split=split,
+            download=True,
+            transform=transform
+        )
+
+        # Sample n examples (or use all if n is larger than dataset size)
+        if n > len(svhn_dataset):
+            indices = torch.arange(len(svhn_dataset))
+        else:
+            g = torch.Generator()
+            g.manual_seed(seed)
+            indices = torch.randperm(len(svhn_dataset), generator=g)[:n]
+
+        # Load data
+        images = []
+        labels = []
+        for idx in indices:
+            img, label = svhn_dataset[int(idx)]
+            images.append(img.flatten())  # Flatten 32x32x3 to 3072
+            labels.append(float(label))  # Convert to float for regression
+
+        self.x = torch.stack(images).to(device=device, dtype=torch.float32)
+        self.y = torch.tensor(labels, device=device, dtype=torch.float32).unsqueeze(1)
+
+        # Handle dimension mismatch: if d != 3072, we'll pad or truncate
+        if d != 3072:
+            if d > 3072:
+                # Pad with zeros
+                padding = torch.zeros(self.x.shape[0], d - 3072, device=device, dtype=torch.float32)
+                self.x = torch.cat([self.x, padding], dim=1)
+            else:
+                # Truncate
+                self.x = self.x[:, :d]
+
+        if noise_std > 0:
+            g = torch.Generator(device=device)
+            g.manual_seed(seed)
+            self.y = self.y + noise_std * torch.randn_like(self.y, generator=g)
+
+        self.n = len(self.x)
+
     def __len__(self): return self.n
     def __getitem__(self, idx: int): return self.x[idx], self.y[idx]
